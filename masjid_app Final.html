@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matinkyla Masjid App</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --green-deep: #1a4a2e;
+    --green-mid: #2d6a4f;
+    --green-light: #40916c;
+    --gold: #b5832a;
+    --gold-light: #e9c46a;
+    --cream: #faf7f2;
+    --cream-dark: #f0ebe0;
+    --text-dark: #1c1c1c;
+    --text-mid: #444;
+    --text-soft: #777;
+    --red: #c0392b;
+    --blue: #1a6fa8;
+    --white: #ffffff;
+    --border: #ddd5c5;
+    --shadow: 0 2px 12px rgba(0,0,0,0.09);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--green-deep) 0%, var(--green-mid) 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .header-title {
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+  }
+  .header-title span { color: var(--gold-light); }
+  .header-date { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+  /* ── NAV TABS ── */
+  nav {
+    background: var(--green-deep);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    overflow-x: auto;
+  }
+  .nav-inner {
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  nav button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.65);
+    padding: 11px 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.02em;
+  }
+  nav button:hover { color: white; }
+  nav button.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold-light);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── PAGE TITLE ── */
+  .page-title {
+    font-family: 'Amiri', serif;
+    font-size: 1.4rem;
+    color: var(--green-deep);
+    margin-bottom: 6px;
+  }
+  .page-sub { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 22px; }
+
+  /* ── SUMMARY CARDS ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--green-light);
+  }
+  .card.income { border-left-color: var(--green-light); }
+  .card.outcome { border-left-color: var(--red); }
+  .card.balance { border-left-color: var(--gold); }
+  .card-label { font-size: 0.73rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+  .card-value { font-size: 1.75rem; font-weight: 600; }
+  .card.income .card-value { color: var(--green-mid); }
+  .card.outcome .card-value { color: var(--red); }
+  .card.balance .card-value { color: var(--gold); }
+
+  /* ── TABLES ── */
+  .table-wrap {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .table-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-head h3 { font-size: 0.95rem; font-weight: 600; color: var(--green-deep); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--cream-dark);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-soft);
+    font-weight: 600;
+    padding: 10px 16px;
+    text-align: left;
+  }
+  td {
+    padding: 11px 16px;
+    font-size: 0.87rem;
+    border-bottom: 1px solid #f0ebe0;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf8f4; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .badge-paid { background: #d4edda; color: #1a5c2e; }
+  .badge-unpaid { background: #fde8e8; color: #8b1c1c; }
+  .badge-partial { background: #fff3cd; color: #7a5500; }
+
+  .amount-positive { color: var(--green-mid); font-weight: 600; }
+  .amount-negative { color: var(--red); font-weight: 600; }
+
+  /* ── FORMS ── */
+  .form-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .form-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--green-deep);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 0.78rem; font-weight: 600; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    background: var(--cream);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--green-light); background: white; }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { background: var(--green-mid); color: white; }
+  .btn-primary:hover { background: var(--green-deep); }
+  .btn-danger { background: var(--red); color: white; font-size: 0.78rem; padding: 6px 14px; }
+  .btn-danger:hover { background: #a93226; }
+  .btn-sm { padding: 5px 12px; font-size: 0.76rem; }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #9a6e22; }
+
+  .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+
+  /* ── SEARCH BAR ── */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-bar input {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 0.87rem;
+    font-family: 'Inter', sans-serif;
+    width: 240px;
+    background: white;
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--green-light); }
+  .search-bar select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.86rem;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    outline: none;
+  }
+
+  /* ── MEMBER PROGRESS ── */
+  .progress-bar-wrap { width: 100%; background: #eee; border-radius: 4px; height: 7px; margin-top: 4px; }
+  .progress-bar { height: 7px; border-radius: 4px; background: var(--green-light); transition: width 0.4s; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+  /* ── PRINT / PDF ── */
+  #pdf-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 600;
+    align-items: center;
+    justify-content: center;
+  }
+  #pdf-modal.open { display: flex; }
+  .pdf-modal-box {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    width: 420px;
+    max-width: 95vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  }
+  .pdf-modal-box h3 {
+    font-family: 'Amiri', serif;
+    color: var(--green-deep);
+    font-size: 1.2rem;
+    margin-bottom: 18px;
+  }
+  .pdf-check-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .pdf-check-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    transition: all 0.15s;
+  }
+  .pdf-check-group label:hover { border-color: var(--green-light); background: #f5fbf7; }
+  .pdf-check-group input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--green-mid); }
+  .pdf-date-row { display: flex; gap: 12px; margin-bottom: 18px; }
+  .pdf-date-row .form-group { flex: 1; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+    }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header-inner { padding: 12px 16px; }
+    main { padding: 20px 12px 50px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .card-value { font-size: 1.4rem; }
+    nav button { padding: 10px 13px; font-size: 0.77rem; }
+    td, th { padding: 9px 10px; font-size: 0.82rem; }
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green-deep);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 0.87rem;
+    font-weight: 500;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── SECTION DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── BANK CARD CHIP ── */
+  .bank-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-deep);
+    color: white;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.76rem;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-title">🕌 Matinkyla <span>Masjid</span> App</div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <button class="btn btn-gold" onclick="openPdfModal()" style="font-size:0.8rem;padding:8px 16px">🖨️ Export PDF</button>
+      <div style="text-align:right">
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.7)">Balance</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--gold-light)" id="headerBalance">€0.00</div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-inner">
+      <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+      <button onclick="showTab('income')">Income</button>
+      <button onclick="showTab('outcome')">Outcome</button>
+      <button onclick="showTab('members')">Members (Xubnaha)</button>
+      <button onclick="showTab('banks')">Banks</button>
+      <button onclick="showTab('expenses')">Masjid Expenses</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <section class="section active" id="sec-dashboard">
+    <div class="page-title">Overview</div>
+    <div class="page-sub">Financial summary for Matinkyla Masjid</div>
+
+    <div class="summary-grid">
+      <div class="card income">
+        <div class="card-label">Total Income</div>
+        <div class="card-value" id="dash-income">€0.00</div>
+      </div>
+      <div class="card outcome">
+        <div class="card-label">Total Outcome</div>
+        <div class="card-value" id="dash-outcome">€0.00</div>
+      </div>
+      <div class="card balance">
+        <div class="card-label">Net Balance</div>
+        <div class="card-value" id="dash-balance">€0.00</div>
+      </div>
+      <div class="card" style="border-left-color:var(--blue)">
+        <div class="card-label">Total Members</div>
+        <div class="card-value" style="color:var(--blue)" id="dash-members">0</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Recent Transactions</h3></div>
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Description</th><th>Type</th><th>Amount</th>
+        </tr></thead>
+        <tbody id="dash-recent">
+          <tr><td colspan="4"><div class="empty"><div class="empty-icon">📋</div>No transactions yet</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Member Payment Status</h3></div>
+      <table>
+        <thead><tr>
+          <th>Member</th><th>Monthly Fee</th><th>Paid</th><th>Status</th>
+        </tr></thead>
+        <tbody id="dash-members-table">
+          <tr><td colspan="4"><div class="empty"><div class="empty-icon">👥</div>No members added yet</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ INCOME ═══════════════ -->
+  <section class="section" id="sec-income">
+    <div class="page-title">Income</div>
+    <div class="page-sub">Record all money received by the Masjid</div>
+
+    <div class="form-card">
+      <h3>Add Income</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="in-date">
+        </div>
+        <div class="form-group">
+          <label>Source</label>
+          <select id="in-source">
+            <option value="">Select source...</option>
+            <option>Member Subscription</option>
+            <option>Donation</option>
+            <option>Sadaqah</option>
+            <option>Zakat</option>
+            <option>Event Collection</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (€)</label>
+          <input type="number" id="in-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Received From</label>
+          <input type="text" id="in-from" placeholder="Name or Anonymous">
+        </div>
+        <div class="form-group">
+          <label>Bank Account</label>
+          <select id="in-bank"></select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="in-notes" placeholder="Optional notes">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addIncome()">+ Add Income</button>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="in-search" placeholder="Search income..." oninput="renderIncome()">
+      <select id="in-filter-source" onchange="renderIncome()">
+        <option value="">All Sources</option>
+        <option>Member Subscription</option>
+        <option>Donation</option>
+        <option>Sadaqah</option>
+        <option>Zakat</option>
+        <option>Event Collection</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Income Records</h3></div>
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Source</th><th>From</th><th>Bank</th><th>Amount</th><th>Notes</th><th></th>
+        </tr></thead>
+        <tbody id="income-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ OUTCOME ═══════════════ -->
+  <section class="section" id="sec-outcome">
+    <div class="page-title">Outcome</div>
+    <div class="page-sub">Record all expenses and payments made</div>
+
+    <div class="form-card">
+      <h3>Add Expense</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="out-date">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="out-cat">
+            <option value="">Select category...</option>
+            <option>Utilities</option>
+            <option>Maintenance</option>
+            <option>Salaries</option>
+            <option>Equipment</option>
+            <option>Cleaning</option>
+            <option>Events</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (€)</label>
+          <input type="number" id="out-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Paid To</label>
+          <input type="text" id="out-to" placeholder="Vendor or person">
+        </div>
+        <div class="form-group">
+          <label>Bank Account</label>
+          <select id="out-bank"></select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="out-desc" placeholder="Brief description">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addOutcome()">+ Add Expense</button>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="out-search" placeholder="Search expenses..." oninput="renderOutcome()">
+      <select id="out-filter-cat" onchange="renderOutcome()">
+        <option value="">All Categories</option>
+        <option>Utilities</option>
+        <option>Maintenance</option>
+        <option>Salaries</option>
+        <option>Equipment</option>
+        <option>Cleaning</option>
+        <option>Events</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Expense Records</h3></div>
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Category</th><th>Paid To</th><th>Bank</th><th>Amount</th><th>Description</th><th></th>
+        </tr></thead>
+        <tbody id="outcome-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ MEMBERS ═══════════════ -->
+  <section class="section" id="sec-members">
+    <div class="page-title">Members (Xubnaha)</div>
+    <div class="page-sub">Track member subscriptions and payment status</div>
+
+    <div class="form-card">
+      <h3>Add Member</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="mem-name" placeholder="Member name">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="mem-phone" placeholder="+358...">
+        </div>
+        <div class="form-group">
+          <label>Monthly Fee (€)</label>
+          <input type="number" id="mem-fee" placeholder="20.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Join Date</label>
+          <input type="date" id="mem-join">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="mem-notes" placeholder="Optional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addMember()">+ Add Member</button>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="mem-search" placeholder="Search members..." oninput="renderMembers()">
+      <select id="mem-filter" onchange="renderMembers()">
+        <option value="">All Status</option>
+        <option value="paid">Paid</option>
+        <option value="unpaid">Unpaid</option>
+        <option value="partial">Partial</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head">
+        <h3>Member List</h3>
+        <div id="members-count" style="font-size:0.8rem;color:var(--text-soft)"></div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Phone</th><th>Monthly Fee</th><th>Amount Paid</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="members-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ BANKS ═══════════════ -->
+  <section class="section" id="sec-banks">
+    <div class="page-title">Bank Accounts</div>
+    <div class="page-sub">Manage Masjid bank accounts and balances</div>
+
+    <div class="form-card">
+      <h3>Add Bank Account</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Bank Name</label>
+          <input type="text" id="bank-name" placeholder="e.g. OP, Nordea, S-Pankki">
+        </div>
+        <div class="form-group">
+          <label>Account Holder</label>
+          <input type="text" id="bank-holder" placeholder="Name on account">
+        </div>
+        <div class="form-group">
+          <label>IBAN (last 4 digits)</label>
+          <input type="text" id="bank-iban" placeholder="e.g. 4521" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label>Opening Balance (€)</label>
+          <input type="number" id="bank-balance" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="bank-notes" placeholder="Optional">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addBank()">+ Add Account</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Bank Accounts</h3></div>
+      <table>
+        <thead><tr>
+          <th>Bank</th><th>Account Holder</th><th>IBAN (last 4)</th><th>Opening Balance</th><th>Current Balance</th><th>Notes</th><th></th>
+        </tr></thead>
+        <tbody id="banks-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ MASJID EXPENSES ═══════════════ -->
+  <section class="section" id="sec-expenses">
+    <div class="page-title">Masjid Expenses</div>
+    <div class="page-sub">Dedicated tracker for Masjid operational expenses</div>
+
+    <div class="form-card">
+      <h3>Add Masjid Expense</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="exp-date">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="exp-cat">
+            <option value="">Select...</option>
+            <option>Electricity</option>
+            <option>Water</option>
+            <option>Internet</option>
+            <option>Rent</option>
+            <option>Imam Salary</option>
+            <option>Cleaning Supplies</option>
+            <option>Qur'an Materials</option>
+            <option>Renovation</option>
+            <option>Events</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (€)</label>
+          <input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Paid To / Vendor</label>
+          <input type="text" id="exp-vendor" placeholder="Vendor or supplier">
+        </div>
+        <div class="form-group">
+          <label>Approved By</label>
+          <input type="text" id="exp-approved" placeholder="Person who approved">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="exp-desc" placeholder="Brief description">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="addExpense()">+ Add Expense</button>
+      </div>
+    </div>
+
+    <div class="summary-grid" style="margin-bottom:20px">
+      <div class="card outcome">
+        <div class="card-label">This Month</div>
+        <div class="card-value" id="exp-month">€0.00</div>
+      </div>
+      <div class="card outcome" style="border-left-color:#8e44ad">
+        <div class="card-label">Total Expenses</div>
+        <div class="card-value" style="color:#8e44ad" id="exp-total">€0.00</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-head"><h3>Expense Records</h3></div>
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Category</th><th>Vendor</th><th>Approved By</th><th>Amount</th><th>Description</th><th></th>
+        </tr></thead>
+        <tbody id="expenses-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast"></div>
+
+<!-- PDF MODAL -->
+<div id="pdf-modal">
+  <div class="pdf-modal-box">
+    <h3>🖨️ Export PDF Report</h3>
+    <div class="pdf-date-row">
+      <div class="form-group">
+        <label>From Date</label>
+        <input type="date" id="pdf-from">
+      </div>
+      <div class="form-group">
+        <label>To Date</label>
+        <input type="date" id="pdf-to">
+      </div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-soft);margin-bottom:14px">Select sections to include:</p>
+    <div class="pdf-check-group">
+      <label><input type="checkbox" id="pdf-summary" checked> 📊 Financial Summary</label>
+      <label><input type="checkbox" id="pdf-income" checked> 💰 Income Records</label>
+      <label><input type="checkbox" id="pdf-outcome" checked> 💸 Expense Records</label>
+      <label><input type="checkbox" id="pdf-members" checked> 👥 Members & Payment Status</label>
+      <label><input type="checkbox" id="pdf-expenses" checked> 🕌 Masjid Expenses</label>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="generatePDF()" style="flex:1">Generate & Print</button>
+      <button class="btn" onclick="closePdfModal()" style="flex:1;background:#eee;color:#444">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT AREA -->
+<div id="print-area" style="display:none"></div>
+
+<!-- PAYMENT MODAL -->
+<div id="pay-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;display:none;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;padding:28px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,0.2)">
+    <h3 style="color:var(--green-deep);margin-bottom:16px;font-family:'Amiri',serif">Record Payment</h3>
+    <p style="font-size:0.85rem;color:var(--text-soft);margin-bottom:14px" id="pay-member-name"></p>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Amount Paid (€)</label>
+      <input type="number" id="pay-amount" placeholder="0.00" min="0" step="0.01">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Payment Date</label>
+      <input type="date" id="pay-date">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" onclick="confirmPayment()" style="flex:1">Confirm</button>
+      <button class="btn" onclick="closePayModal()" style="flex:1;background:#eee;color:#444">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let state = {
+  income: [],
+  outcome: [],
+  members: [],
+  banks: [],
+  expenses: []
+};
+
+let payMemberIdx = null;
+
+// ═══════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════
+function save() {
+  localStorage.setItem('masjid_app', JSON.stringify(state));
+}
+function load() {
+  const d = localStorage.getItem('masjid_app');
+  if (d) state = JSON.parse(d);
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function fmt(n) { return '€' + Number(n||0).toFixed(2); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function toast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color || 'var(--green-deep)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function id(x) { return document.getElementById(x); }
+
+function totalIncome() { return state.income.reduce((s,r) => s + Number(r.amount), 0); }
+function totalOutcome() { return state.outcome.reduce((s,r) => s + Number(r.amount), 0); }
+function balance() { return totalIncome() - totalOutcome(); }
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  id('sec-' + tab).classList.add('active');
+  const tabs = ['dashboard','income','outcome','members','banks','expenses'];
+  const btns = document.querySelectorAll('nav button');
+  btns[tabs.indexOf(tab)].classList.add('active');
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'income') { populateBankSelect('in-bank'); renderIncome(); }
+  if (tab === 'outcome') { populateBankSelect('out-bank'); renderOutcome(); }
+  if (tab === 'members') renderMembers();
+  if (tab === 'banks') renderBanks();
+  if (tab === 'expenses') renderExpenses();
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const inc = totalIncome(), out = totalOutcome(), bal = balance();
+  id('dash-income').textContent = fmt(inc);
+  id('dash-outcome').textContent = fmt(out);
+  id('dash-balance').textContent = fmt(bal);
+  id('dash-balance').style.color = bal >= 0 ? 'var(--gold)' : 'var(--red)';
+  id('dash-members').textContent = state.members.length;
+  id('headerBalance').textContent = fmt(bal);
+
+  // Recent transactions (last 8)
+  const all = [
+    ...state.income.map(r => ({...r, _type:'Income'})),
+    ...state.outcome.map(r => ({...r, _type:'Expense'}))
+  ].sort((a,b) => b.date.localeCompare(a.date)).slice(0,8);
+
+  const tb = id('dash-recent');
+  if (!all.length) {
+    tb.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="empty-icon">📋</div>No transactions yet</div></td></tr>';
+  } else {
+    tb.innerHTML = all.map(r => `<tr>
+      <td>${r.date}</td>
+      <td>${r.description || r.source || r.category || '—'}</td>
+      <td><span class="badge ${r._type==='Income'?'badge-paid':'badge-unpaid'}">${r._type}</span></td>
+      <td class="${r._type==='Income'?'amount-positive':'amount-negative'}">${r._type==='Income'?'+':'-'}${fmt(r.amount)}</td>
+    </tr>`).join('');
+  }
+
+  // Members table
+  const mt = id('dash-members-table');
+  if (!state.members.length) {
+    mt.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="empty-icon">👥</div>No members added yet</div></td></tr>';
+  } else {
+    mt.innerHTML = state.members.map(m => {
+      const pct = m.fee > 0 ? Math.min(100,(m.paid/m.fee)*100) : 0;
+      const status = m.paid >= m.fee ? 'paid' : m.paid > 0 ? 'partial' : 'unpaid';
+      const label = status === 'paid' ? 'Paid' : status === 'partial' ? 'Partial' : 'Unpaid';
+      return `<tr>
+        <td>${m.name}</td>
+        <td>${fmt(m.fee)}/mo</td>
+        <td>${fmt(m.paid)}</td>
+        <td><span class="badge badge-${status}">${label}</span></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// INCOME
+// ═══════════════════════════════════════════════
+function addIncome() {
+  const date = id('in-date').value || today();
+  const source = id('in-source').value;
+  const amount = parseFloat(id('in-amount').value);
+  const from = id('in-from').value.trim();
+  const bank = id('in-bank').value;
+  const notes = id('in-notes').value.trim();
+
+  if (!source) return toast('Please select a source', 'var(--red)');
+  if (!amount || amount <= 0) return toast('Enter a valid amount', 'var(--red)');
+
+  state.income.push({ id: Date.now(), date, source, amount, from, bank, notes });
+  save(); renderIncome(); updateHeader();
+  ['in-date','in-amount','in-from','in-notes'].forEach(x => id(x).value = '');
+  id('in-source').value = '';
+  toast('Income added ✓');
+}
+
+function renderIncome() {
+  const search = (id('in-search')?.value || '').toLowerCase();
+  const fsource = id('in-filter-source')?.value || '';
+  let data = state.income.filter(r => {
+    const m = [r.source, r.from, r.notes, r.date].join(' ').toLowerCase();
+    return m.includes(search) && (!fsource || r.source === fsource);
+  }).sort((a,b) => b.date.localeCompare(a.date));
+
+  const tb = id('income-table');
+  if (!data.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">💰</div>No income records</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map(r => `<tr>
+    <td>${r.date}</td>
+    <td>${r.source}</td>
+    <td>${r.from || '—'}</td>
+    <td>${r.bank || '—'}</td>
+    <td class="amount-positive">+${fmt(r.amount)}</td>
+    <td>${r.notes || '—'}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteIncome(${r.id})">Delete</button></td>
+  </tr>`).join('');
+}
+
+function deleteIncome(iid) {
+  if (!confirm('Delete this income record?')) return;
+  state.income = state.income.filter(r => r.id !== iid);
+  save(); renderIncome(); updateHeader();
+  toast('Deleted');
+}
+
+// ═══════════════════════════════════════════════
+// OUTCOME
+// ═══════════════════════════════════════════════
+function addOutcome() {
+  const date = id('out-date').value || today();
+  const category = id('out-cat').value;
+  const amount = parseFloat(id('out-amount').value);
+  const to = id('out-to').value.trim();
+  const bank = id('out-bank').value;
+  const description = id('out-desc').value.trim();
+
+  if (!category) return toast('Please select a category', 'var(--red)');
+  if (!amount || amount <= 0) return toast('Enter a valid amount', 'var(--red)');
+
+  state.outcome.push({ id: Date.now(), date, category, amount, to, bank, description });
+  save(); renderOutcome(); updateHeader();
+  ['out-date','out-amount','out-to','out-desc'].forEach(x => id(x).value = '');
+  id('out-cat').value = '';
+  toast('Expense added ✓');
+}
+
+function renderOutcome() {
+  const search = (id('out-search')?.value || '').toLowerCase();
+  const fcat = id('out-filter-cat')?.value || '';
+  let data = state.outcome.filter(r => {
+    const m = [r.category, r.to, r.description, r.date].join(' ').toLowerCase();
+    return m.includes(search) && (!fcat || r.category === fcat);
+  }).sort((a,b) => b.date.localeCompare(a.date));
+
+  const tb = id('outcome-table');
+  if (!data.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">💸</div>No expense records</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map(r => `<tr>
+    <td>${r.date}</td>
+    <td>${r.category}</td>
+    <td>${r.to || '—'}</td>
+    <td>${r.bank || '—'}</td>
+    <td class="amount-negative">-${fmt(r.amount)}</td>
+    <td>${r.description || '—'}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteOutcome(${r.id})">Delete</button></td>
+  </tr>`).join('');
+}
+
+function deleteOutcome(iid) {
+  if (!confirm('Delete this expense?')) return;
+  state.outcome = state.outcome.filter(r => r.id !== iid);
+  save(); renderOutcome(); updateHeader();
+  toast('Deleted');
+}
+
+// ═══════════════════════════════════════════════
+// MEMBERS
+// ═══════════════════════════════════════════════
+function addMember() {
+  const name = id('mem-name').value.trim();
+  const phone = id('mem-phone').value.trim();
+  const fee = parseFloat(id('mem-fee').value) || 0;
+  const join = id('mem-join').value || today();
+  const notes = id('mem-notes').value.trim();
+
+  if (!name) return toast('Enter member name', 'var(--red)');
+
+  state.members.push({ id: Date.now(), name, phone, fee, join, notes, paid: 0, payments: [] });
+  save(); renderMembers();
+  ['mem-name','mem-phone','mem-fee','mem-join','mem-notes'].forEach(x => id(x).value = '');
+  toast('Member added ✓');
+}
+
+function renderMembers() {
+  const search = (id('mem-search')?.value || '').toLowerCase();
+  const fstatus = id('mem-filter')?.value || '';
+  let data = state.members.filter(m => {
+    const status = m.paid >= m.fee ? 'paid' : m.paid > 0 ? 'partial' : 'unpaid';
+    const match = [m.name, m.phone, m.notes].join(' ').toLowerCase().includes(search);
+    return match && (!fstatus || status === fstatus);
+  });
+
+  const paid = state.members.filter(m => m.paid >= m.fee && m.fee > 0).length;
+  const unpaid = state.members.filter(m => m.paid === 0).length;
+  id('members-count').textContent = `${state.members.length} total · ${paid} paid · ${unpaid} unpaid`;
+
+  const tb = id('members-table');
+  if (!data.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">👥</div>No members found</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = data.map((m, i) => {
+    const status = m.paid >= m.fee && m.fee > 0 ? 'paid' : m.paid > 0 ? 'partial' : 'unpaid';
+    const label = {paid:'Paid',partial:'Partial',unpaid:'Unpaid'}[status];
+    const idx = state.members.indexOf(m);
+    return `<tr>
+      <td style="color:var(--text-soft)">${idx+1}</td>
+      <td><strong>${m.name}</strong>${m.notes ? `<br><span style="font-size:0.75rem;color:var(--text-soft)">${m.notes}</span>`:''}</td>
+      <td>${m.phone || '—'}</td>
+      <td>${fmt(m.fee)}/mo</td>
+      <td>${fmt(m.paid)}</td>
+      <td><span class="badge badge-${status}">${label}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-gold btn-sm" onclick="openPayModal(${idx})">Pay</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMember(${idx})">Remove</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openPayModal(idx) {
+  payMemberIdx = idx;
+  const m = state.members[idx];
+  id('pay-member-name').textContent = `Recording payment for: ${m.name} (Fee: ${fmt(m.fee)}/month)`;
+  id('pay-amount').value = '';
+  id('pay-date').value = today();
+  id('pay-modal').style.display = 'flex';
+}
+
+function closePayModal() {
+  id('pay-modal').style.display = 'none';
+  payMemberIdx = null;
+}
+
+function confirmPayment() {
+  const amount = parseFloat(id('pay-amount').value);
+  const date = id('pay-date').value || today();
+  if (!amount || amount <= 0) return toast('Enter a valid amount', 'var(--red)');
+
+  const m = state.members[payMemberIdx];
+  m.paid = (m.paid || 0) + amount;
+  m.payments = m.payments || [];
+  m.payments.push({ date, amount });
+
+  // Also add to income
+  state.income.push({
+    id: Date.now(), date,
+    source: 'Member Subscription',
+    amount,
+    from: m.name,
+    bank: '',
+    notes: 'Member fee payment'
+  });
+
+  save(); renderMembers(); updateHeader();
+  closePayModal();
+  toast(`Payment of ${fmt(amount)} recorded for ${m.name} ✓`);
+}
+
+function deleteMember(idx) {
+  if (!confirm(`Remove ${state.members[idx].name}?`)) return;
+  state.members.splice(idx, 1);
+  save(); renderMembers();
+  toast('Member removed');
+}
+
+// ═══════════════════════════════════════════════
+// BANKS
+// ═══════════════════════════════════════════════
+function addBank() {
+  const name = id('bank-name').value.trim();
+  const holder = id('bank-holder').value.trim();
+  const iban = id('bank-iban').value.trim();
+  const balance = parseFloat(id('bank-balance').value) || 0;
+  const notes = id('bank-notes').value.trim();
+
+  if (!name) return toast('Enter bank name', 'var(--red)');
+
+  state.banks.push({ id: Date.now(), name, holder, iban, balance, notes });
+  save(); renderBanks();
+  ['bank-name','bank-holder','bank-iban','bank-balance','bank-notes'].forEach(x => id(x).value = '');
+  toast('Bank account added ✓');
+}
+
+function renderBanks() {
+  const tb = id('banks-table');
+  if (!state.banks.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏦</div>No bank accounts added</div></td></tr>';
+    return;
+  }
+  tb.innerHTML = state.banks.map(b => {
+    // current balance = opening + income assigned to this bank - outcome assigned to this bank
+    const inc = state.income.filter(r => r.bank === b.name).reduce((s,r) => s+Number(r.amount), 0);
+    const out = state.outcome.filter(r => r.bank === b.name).reduce((s,r) => s+Number(r.amount), 0);
+    const cur = Number(b.balance) + inc - out;
+    return `<tr>
+      <td><span class="bank-chip">🏦 ${b.name}</span></td>
+      <td>${b.holder || '—'}</td>
+      <td>****${b.iban || '????'}</td>
+      <td>${fmt(b.balance)}</td>
+      <td class="${cur>=0?'amount-positive':'amount-negative'}">${fmt(cur)}</td>
+      <td>${b.notes || '—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteBank(${b.id})">Remove</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function deleteBank(bid) {
+  if (!confirm('Remove this bank account?')) return;
+  state.banks = state.banks.filter(b => b.id !== bid);
+  save(); renderBanks();
+  toast('Removed');
+}
+
+function populateBankSelect(sel) {
+  const el = id(sel);
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">No specific bank</option>' +
+    state.banks.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+  el.value = cur;
+}
+
+// ═══════════════════════════════════════════════
+// MASJID EXPENSES
+// ═══════════════════════════════════════════════
+function addExpense() {
+  const date = id('exp-date').value || today();
+  const category = id('exp-cat').value;
+  const amount = parseFloat(id('exp-amount').value);
+  const vendor = id('exp-vendor').value.trim();
+  const approved = id('exp-approved').value.trim();
+  const description = id('exp-desc').value.trim();
+
+  if (!category) return toast('Please select a category', 'var(--red)');
+  if (!amount || amount <= 0) return toast('Enter a valid amount', 'var(--red)');
+
+  state.expenses.push({ id: Date.now(), date, category, amount, vendor, approved, description });
+
+  // Also add to outcome
+  state.outcome.push({
+    id: Date.now()+1, date, category,
+    amount, to: vendor, bank: '',
+    description: description || category
+  });
+
+  save(); renderExpenses(); updateHeader();
+  ['exp-date','exp-amount','exp-vendor','exp-approved','exp-desc'].forEach(x => id(x).value = '');
+  id('exp-cat').value = '';
+  toast('Expense recorded ✓');
+}
+
+function renderExpenses() {
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const monthTotal = state.expenses
+    .filter(e => e.date.startsWith(thisMonth))
+    .reduce((s,e) => s+Number(e.amount), 0);
+  const total = state.expenses.reduce((s,e) => s+Number(e.amount), 0);
+  id('exp-month').textContent = fmt(monthTotal);
+  id('exp-total').textContent = fmt(total);
+
+  const tb = id('expenses-table');
+  if (!state.expenses.length) {
+    tb.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🕌</div>No expenses recorded</div></td></tr>';
+    return;
+  }
+  const data = [...state.expenses].sort((a,b) => b.date.localeCompare(a.date));
+  tb.innerHTML = data.map(e => `<tr>
+    <td>${e.date}</td>
+    <td>${e.category}</td>
+    <td>${e.vendor || '—'}</td>
+    <td>${e.approved || '—'}</td>
+    <td class="amount-negative">-${fmt(e.amount)}</td>
+    <td>${e.description || '—'}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">Delete</button></td>
+  </tr>`).join('');
+}
+
+function deleteExpense(eid) {
+  if (!confirm('Delete this expense?')) return;
+  state.expenses = state.expenses.filter(e => e.id !== eid);
+  save(); renderExpenses();
+  toast('Deleted');
+}
+
+// ═══════════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════════
+function updateHeader() {
+  id('headerBalance').textContent = fmt(balance());
+}
+
+// ═══════════════════════════════════════════════
+// PDF / PRINT
+// ═══════════════════════════════════════════════
+function openPdfModal() {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  id('pdf-from').value = firstDay;
+  id('pdf-to').value = today();
+  id('pdf-modal').classList.add('open');
+}
+function closePdfModal() { id('pdf-modal').classList.remove('open'); }
+
+function generatePDF() {
+  const from = id('pdf-from').value;
+  const to = id('pdf-to').value;
+  const incFilter = r => (!from || r.date >= from) && (!to || r.date <= to);
+
+  const incData = state.income.filter(incFilter);
+  const outData = state.outcome.filter(incFilter);
+  const expData = state.expenses.filter(incFilter);
+  const totalInc = incData.reduce((s,r) => s+Number(r.amount), 0);
+  const totalOut = outData.reduce((s,r) => s+Number(r.amount), 0);
+  const bal = totalInc - totalOut;
+
+  let html = `
+  <style>
+    body { font-family: Arial, sans-serif; color: #1c1c1c; font-size: 13px; }
+    .pdf-header { background: #1a4a2e; color: white; padding: 24px 28px; margin-bottom: 24px; }
+    .pdf-header h1 { font-size: 22px; margin-bottom: 4px; }
+    .pdf-header p { font-size: 12px; opacity: 0.75; }
+    .summary-row { display: flex; gap: 16px; margin-bottom: 24px; }
+    .sum-card { flex:1; border: 1px solid #ddd; border-radius: 8px; padding: 14px 18px; }
+    .sum-card .lbl { font-size: 10px; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+    .sum-card .val { font-size: 20px; font-weight: 700; }
+    .green { color: #2d6a4f; } .red { color: #c0392b; } .gold { color: #b5832a; }
+    h2 { font-size: 14px; color: #1a4a2e; border-bottom: 2px solid #1a4a2e; padding-bottom: 6px; margin: 22px 0 12px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th { background: #f0ebe0; font-size: 10px; text-transform: uppercase; color: #666; padding: 8px 10px; text-align: left; }
+    td { padding: 8px 10px; border-bottom: 1px solid #f0ebe0; font-size: 12px; }
+    .badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+    .paid { background: #d4edda; color: #1a5c2e; }
+    .unpaid { background: #fde8e8; color: #8b1c1c; }
+    .partial { background: #fff3cd; color: #7a5500; }
+    .footer { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 12px; font-size: 10px; color: #aaa; text-align: center; }
+  </style>
+  <div class="pdf-header">
+    <h1>🕌 Matinkyla Masjid — Financial Report</h1>
+    <p>Period: ${from || 'All time'} to ${to || 'Today'} &nbsp;|&nbsp; Generated: ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}</p>
+  </div>`;
+
+  if (id('pdf-summary').checked) {
+    html += `
+    <div class="summary-row">
+      <div class="sum-card"><div class="lbl">Total Income</div><div class="val green">€${totalInc.toFixed(2)}</div></div>
+      <div class="sum-card"><div class="lbl">Total Outcome</div><div class="val red">€${totalOut.toFixed(2)}</div></div>
+      <div class="sum-card"><div class="lbl">Net Balance</div><div class="val gold">€${bal.toFixed(2)}</div></div>
+      <div class="sum-card"><div class="lbl">Members</div><div class="val" style="color:#1a6fa8">${state.members.length}</div></div>
+    </div>`;
+  }
+
+  if (id('pdf-income').checked && incData.length) {
+    html += `<h2>💰 Income Records</h2><table>
+    <tr><th>Date</th><th>Source</th><th>From</th><th>Amount</th><th>Notes</th></tr>
+    ${incData.sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<tr>
+      <td>${r.date}</td><td>${r.source}</td><td>${r.from||'—'}</td>
+      <td style="color:#2d6a4f;font-weight:700">+€${Number(r.amount).toFixed(2)}</td><td>${r.notes||'—'}</td>
+    </tr>`).join('')}
+    <tr style="background:#f5fbf7"><td colspan="3"><strong>Total</strong></td><td style="color:#2d6a4f;font-weight:700">+€${totalInc.toFixed(2)}</td><td></td></tr>
+    </table>`;
+  }
+
+  if (id('pdf-outcome').checked && outData.length) {
+    html += `<h2>💸 Expense Records</h2><table>
+    <tr><th>Date</th><th>Category</th><th>Paid To</th><th>Amount</th><th>Description</th></tr>
+    ${outData.sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<tr>
+      <td>${r.date}</td><td>${r.category}</td><td>${r.to||'—'}</td>
+      <td style="color:#c0392b;font-weight:700">-€${Number(r.amount).toFixed(2)}</td><td>${r.description||'—'}</td>
+    </tr>`).join('')}
+    <tr style="background:#fff5f5"><td colspan="3"><strong>Total</strong></td><td style="color:#c0392b;font-weight:700">-€${totalOut.toFixed(2)}</td><td></td></tr>
+    </table>`;
+  }
+
+  if (id('pdf-members').checked && state.members.length) {
+    html += `<h2>👥 Member Payment Status</h2><table>
+    <tr><th>#</th><th>Name</th><th>Phone</th><th>Monthly Fee</th><th>Amount Paid</th><th>Status</th></tr>
+    ${state.members.map((m,i)=>{
+      const status = m.paid>=m.fee&&m.fee>0?'paid':m.paid>0?'partial':'unpaid';
+      const label = {paid:'Paid',partial:'Partial',unpaid:'Unpaid'}[status];
+      return `<tr>
+        <td>${i+1}</td><td><strong>${m.name}</strong></td><td>${m.phone||'—'}</td>
+        <td>€${Number(m.fee).toFixed(2)}/mo</td>
+        <td>€${Number(m.paid).toFixed(2)}</td>
+        <td><span class="badge ${status}">${label}</span></td>
+      </tr>`;
+    }).join('')}
+    </table>`;
+  }
+
+  if (id('pdf-expenses').checked && expData.length) {
+    const expTotal = expData.reduce((s,e)=>s+Number(e.amount),0);
+    html += `<h2>🕌 Masjid Expenses</h2><table>
+    <tr><th>Date</th><th>Category</th><th>Vendor</th><th>Approved By</th><th>Amount</th><th>Description</th></tr>
+    ${expData.sort((a,b)=>b.date.localeCompare(a.date)).map(e=>`<tr>
+      <td>${e.date}</td><td>${e.category}</td><td>${e.vendor||'—'}</td><td>${e.approved||'—'}</td>
+      <td style="color:#c0392b;font-weight:700">-€${Number(e.amount).toFixed(2)}</td><td>${e.description||'—'}</td>
+    </tr>`).join('')}
+    <tr style="background:#fff5f5"><td colspan="4"><strong>Total</strong></td><td style="color:#c0392b;font-weight:700">-€${expTotal.toFixed(2)}</td><td></td></tr>
+    </table>`;
+  }
+
+  html += `<div class="footer">Matinkyla Masjid App — Confidential Financial Report — ${new Date().toLocaleDateString()}</div>`;
+
+  // Open print window
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><title>Masjid Report</title></head><body>${html}</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 600);
+  closePdfModal();
+  toast('Report ready — print dialog opened ✓');
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+function init() {
+  load();
+  const now = new Date();
+  id('headerDate').textContent = now.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  // Set default dates
+  ['in-date','out-date','mem-join','exp-date'].forEach(x => { if(id(x)) id(x).value = today(); });
+  renderDashboard();
+  updateHeader();
+}
+
+init();
+</script>
+</body>
+</html>
